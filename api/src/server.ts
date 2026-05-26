@@ -8,6 +8,7 @@ import { compileTransfers } from './compile/gtfs';
 import { startRebuild, getRebuildState } from './otp/rebuild';
 import type { TransferRule } from './rules/types';
 import { readProfile, writeProfile } from './profile/store';
+import { computeAdvice } from './enrich/advice';
 import { fetchDisruptions } from './disruptions/client';
 import { geocodeNL } from './geocode/nominatim';
 import { listHistory, addHistory } from './history/store';
@@ -84,6 +85,11 @@ app.put('/api/profile', async (req) => {
   const updated = { ...current, ...incoming };
   writeProfile(updated);
   return updated;
+});
+
+app.get('/api/advice', async () => {
+  const profile = readProfile();
+  return computeAdvice(profile.savedRoutes);
 });
 
 app.get('/api/disruptions', async () => ({ disruptions: await fetchDisruptions() }));

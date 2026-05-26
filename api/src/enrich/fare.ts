@@ -17,6 +17,14 @@ function isPeak(startTimeMs: number): boolean {
   return (mins >= 390 && mins < 540) || (mins >= 960 && mins < 1110);
 }
 
+export function discountFactor(discountId: string, peak: boolean): number {
+  if (discountId === 'ov-jaarkaart') return 1.0;
+  if (discountId === 'altijd-voordeel') return 0.4;
+  if (!peak && discountId === 'dal-vrij') return 1.0;
+  if (!peak && discountId === 'dal-voordeel') return 0.4;
+  return 0;
+}
+
 export function calcFare(
   legs: ShapedLeg[],
   activeDiscounts: string[],
@@ -28,15 +36,9 @@ export function calcFare(
 
   const peak = isPeak(startTimeMs);
   let factor = 0;
-
-  if (activeDiscounts.includes('ov-jaarkaart')) {
-    factor = 1.0;
-  } else if (activeDiscounts.includes('altijd-voordeel')) {
-    factor = 0.4;
-  } else if (!peak && activeDiscounts.includes('dal-vrij')) {
-    factor = 1.0;
-  } else if (!peak && activeDiscounts.includes('dal-voordeel')) {
-    factor = 0.4;
+  for (const id of activeDiscounts) {
+    const f = discountFactor(id, peak);
+    if (f > factor) factor = f;
   }
 
   return { base, discounted: Math.round(base * (1 - factor) * 100) / 100 };

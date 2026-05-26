@@ -125,3 +125,18 @@ export type LocationHit = StopHit | AddressHit;
 export function isStopHit(h: LocationHit): h is StopHit {
   return 'gtfsId' in h;
 }
+
+export interface AdviceOption {
+  subscriptionId: string;
+  label: string;
+  monthlyEur: number;
+}
+
+export interface Advice {
+  recommended: string | null;
+  options: AdviceOption[];
+  assumptions: {
+    peakShare: number;
+    weeksPerMonth: number;
+  };
+}

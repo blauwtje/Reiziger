@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react';
-import type { UserProfile } from '../types';
+import { useState, useEffect, type ReactNode } from 'react';
+import type { UserProfile, Advice } from '../types';
+import { api } from '../api';
 
 interface Props {
   profile: UserProfile | null;
@@ -49,6 +50,18 @@ const DISCOUNT_LABELS: Record<string, string> = {
 };
 
 export function MijBoard({ profile, onProfileChange }: Props) {
+  const [advice, setAdvice] = useState<Advice | null>(null);
+  const [adviceLoading, setAdviceLoading] = useState(false);
+
+  useEffect(() => {
+    if (!profile || profile.savedRoutes.length === 0) {
+      setAdvice(null);
+      return;
+    }
+    setAdviceLoading(true);
+    api.advice().then(setAdvice).catch(() => setAdvice(null)).finally(() => setAdviceLoading(false));
+  }, [profile?.savedRoutes]);
+
   if (!profile) return <div className="flex items-center justify-center h-full text-fg-faint text-sm">Laden…</div>;
 
   const update = (patch: Partial<UserProfile>) => onProfileChange({ ...profile, ...patch });
@@ -156,17 +169,23 @@ export function MijBoard({ profile, onProfileChange }: Props) {
         </SettingsBlock>
 
         <SettingsBlock title="Abonnementsadvies">
-          {profile.savedRoutes.length === 0 ? (
+          {!profile.savedRoutes.length ? (
             <p className="text-sm text-fg-faint py-2">Voeg vaste routes toe om een abonnementsadvies te zien.</p>
-          ) : profile.savedRoutes.length <= 2 ? (
-            <div className="py-2">
-              <div className="text-sm font-semibold text-fg mb-1">Dal Voordeel</div>
-              <div className="text-xs text-fg-dim">40% korting buiten de spits. Geschikt voor jouw reispatroon.</div>
-            </div>
+          ) : adviceLoading || !advice ? (
+            <p className="text-sm text-fg-faint py-2">Berekenen…</p>
+          ) : advice.recommended === null ? (
+            <p className="text-sm text-fg-faint py-2">Voeg vaste routes toe om een abonnementsadvies te zien.</p>
           ) : (
-            <div className="py-2">
-              <div className="text-sm font-semibold text-fg mb-1">Altijd Voordeel</div>
-              <div className="text-xs text-fg-dim">40% korting op alle ritten. Bij 3+ vaste routes meestal voordeliger.</div>
+            <div className="py-1 space-y-1">
+              {advice.options.map((opt) => (
+                <div key={opt.subscriptionId} className={`flex items-center justify-between py-1.5 px-2 rounded ${opt.subscriptionId === advice.recommended ? 'bg-signal/10 border border-signal/30' : ''}`}>
+                  <span className={`text-sm ${opt.subscriptionId === advice.recommended ? 'font-semibold text-fg' : 'text-fg-dim'}`}>
+                    {opt.label}
+                    {opt.subscriptionId === advice.recommended && <span className="ml-1.5 text-xs text-signal">★ aanbevolen</span>}
+                  </span>
+                  <span className="text-sm font-mono text-fg">€{opt.monthlyEur.toFixed(2)}/mnd</span>
+                </div>
+              ))}
             </div>
           )}
         </SettingsBlock>
