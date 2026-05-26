@@ -48,6 +48,7 @@ app.post('/api/plan', async (req, reply) => {
       minTransferSec: profile.minTransferSec,
       walkSpeedKmh: profile.walkSpeedKmh,
       bikeSpeedKmh: profile.bikeSpeedKmh,
+      bikeAccess: true,
     },
   ) };
 });
