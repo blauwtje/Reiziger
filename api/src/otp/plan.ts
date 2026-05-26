@@ -61,7 +61,24 @@ export interface ShapedItinerary {
   discountFareEuros: number | null;
 }
 
-const PLAN_QUERY_BODY = `
+function buildPlanQuery(withBike: boolean) {
+  const modes = withBike
+    ? '[{ mode: TRANSIT }, { mode: WALK }, { mode: BICYCLE, qualifier: PARK }]'
+    : '[{ mode: TRANSIT }, { mode: WALK }]';
+  return `
+query Plan($from: String!, $to: String!, $date: String!, $time: String!, $arriveBy: Boolean!, $num: Int!, $walkSpeed: Float, $bikeSpeed: Float, $minTransferTime: Int) {
+  plan(
+    fromPlace: $from
+    toPlace: $to
+    date: $date
+    time: $time
+    arriveBy: $arriveBy
+    numItineraries: $num
+    walkSpeed: $walkSpeed
+    bikeSpeed: $bikeSpeed
+    minTransferTime: $minTransferTime
+    transportModes: ${modes}
+  ) {
     routingErrors { code description }
     itineraries {
       startTime
@@ -84,36 +101,10 @@ const PLAN_QUERY_BODY = `
     }
   }
 }`;
+}
 
-const PLAN_QUERY = `
-query Plan($from: String!, $to: String!, $date: String!, $time: String!, $arriveBy: Boolean!, $num: Int!, $walkSpeed: Float, $bikeSpeed: Float, $minTransferTime: Int) {
-  plan(
-    fromPlace: $from
-    toPlace: $to
-    date: $date
-    time: $time
-    arriveBy: $arriveBy
-    numItineraries: $num
-    walkSpeed: $walkSpeed
-    bikeSpeed: $bikeSpeed
-    minTransferTime: $minTransferTime
-    transportModes: [{ mode: TRANSIT }, { mode: WALK }]
-  ) {` + PLAN_QUERY_BODY;
-
-const PLAN_QUERY_BIKE = `
-query Plan($from: String!, $to: String!, $date: String!, $time: String!, $arriveBy: Boolean!, $num: Int!, $walkSpeed: Float, $bikeSpeed: Float, $minTransferTime: Int) {
-  plan(
-    fromPlace: $from
-    toPlace: $to
-    date: $date
-    time: $time
-    arriveBy: $arriveBy
-    numItineraries: $num
-    walkSpeed: $walkSpeed
-    bikeSpeed: $bikeSpeed
-    minTransferTime: $minTransferTime
-    transportModes: [{ mode: TRANSIT }, { mode: WALK }, { mode: BICYCLE, qualifier: PARK }]
-  ) {` + PLAN_QUERY_BODY;
+const PLAN_QUERY = buildPlanQuery(false);
+const PLAN_QUERY_BIKE = buildPlanQuery(true);
 
 interface RawLeg {
   mode: string;
@@ -211,6 +202,7 @@ export async function planArriveBy(
     arriveBy: true,
     num,
   };
+  // OTP expects m/s; 1 km/h = 1/3.6 m/s
   if (options?.walkSpeedKmh != null) vars.walkSpeed = options.walkSpeedKmh / 3.6;
   if (options?.bikeSpeedKmh != null) vars.bikeSpeed = options.bikeSpeedKmh / 3.6;
   if (options?.minTransferSec != null) vars.minTransferTime = options.minTransferSec;
