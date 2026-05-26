@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '../api';
-import type { ShapedItinerary, StopHit } from '../types';
+import type { ShapedItinerary, LocationHit } from '../types';
+import { isStopHit } from '../types';
 
 function defaultArrive(): string {
   const d = new Date();
@@ -10,9 +11,14 @@ function defaultArrive(): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export function usePlanSearch() {
-  const [origin, setOrigin] = useState<StopHit | null>(null);
-  const [dest, setDest] = useState<StopHit | null>(null);
+function locationToParam(loc: LocationHit): string {
+  if (isStopHit(loc)) return loc.gtfsId;
+  return `${loc.lat},${loc.lon}`;
+}
+
+export function usePlanSearch({ discounts = [] }: { discounts?: string[] } = {}) {
+  const [origin, setOrigin] = useState<LocationHit | null>(null);
+  const [dest, setDest] = useState<LocationHit | null>(null);
   const [arriveBy, setArriveBy] = useState(defaultArrive());
   const [itineraries, setItineraries] = useState<ShapedItinerary[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -26,7 +32,7 @@ export function usePlanSearch() {
     setError(null);
     setItineraries(null);
     try {
-      const r = await api.plan(origin.gtfsId, dest.gtfsId, arriveBy);
+      const r = await api.plan(locationToParam(origin), locationToParam(dest), arriveBy, discounts);
       r.sort((a, b) => b.startTime - a.startTime);
       setItineraries(r);
     } catch (e) {

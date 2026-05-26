@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api, type Health } from './api';
+import type { UserProfile } from './types';
 import { usePlanSearch } from './plan/usePlanSearch';
 import { RailSearch } from './plan/RailSearch';
 import { ResultsBoard } from './plan/ResultsBoard';
@@ -17,7 +18,16 @@ const NAV_TABS: { id: Tab; label: string }[] = [
 export function App() {
   const [tab, setTab] = useState<Tab>('plan');
   const [health, setHealth] = useState<Health | null>(null);
-  const plan = usePlanSearch();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    api.profile().then(setProfile).catch(() => {});
+  }, []);
+
+  const theme = profile?.theme ?? 'dark';
+  const activeDiscounts = profile?.discounts.filter(d => d.active).map(d => d.id) ?? [];
+
+  const plan = usePlanSearch({ discounts: activeDiscounts });
 
   const refreshHealth = () =>
     api.health().then(setHealth).catch(() => setHealth(null));
@@ -34,7 +44,7 @@ export function App() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-ink-950">
+    <div data-theme={theme} className="flex flex-col h-screen overflow-hidden bg-ink-950">
       {/* Top nav */}
       <header className="flex h-14 shrink-0 items-center border-b border-line bg-ink-950/95 px-5 backdrop-blur z-20">
         <div className="flex items-center gap-2.5 mr-7">
@@ -99,6 +109,8 @@ export function App() {
               onSearch={plan.search}
               loading={plan.loading}
               canSearch={plan.canSearch}
+              profile={profile}
+              onProfileChange={(p) => { setProfile(p); api.updateProfile(p); }}
             />
           ) : (
             <RailMij onRulesChanged={refreshHealth} />

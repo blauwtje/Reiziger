@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react';
-import type { ShapedItinerary, StopHit } from '../types';
+import type { ShapedItinerary, LocationHit } from '../types';
 import { fmtTime, fmtDuration, fmtMin, bufferTone } from '../lib/format';
 import { Flap } from '../components/Flap';
 import { ModalityRow } from '../components/ModalityGlyph';
@@ -11,8 +11,8 @@ export function ResultsBoard({
   dest,
 }: {
   itineraries: ShapedItinerary[];
-  origin: StopHit;
-  dest: StopHit;
+  origin: LocationHit;
+  dest: LocationHit;
 }) {
   const [expanded, setExpanded] = useState<number | null>(0);
 

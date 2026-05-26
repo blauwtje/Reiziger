@@ -1,4 +1,4 @@
-import type { ShapedItinerary, ShapedLeg, StopHit } from '../types';
+import type { ShapedItinerary, ShapedLeg, LocationHit } from '../types';
 import { fmtTime, fmtDuration, fmtMin, bufferTone } from '../lib/format';
 import { Flap } from '../components/Flap';
 import { ModalityGlyph } from '../components/ModalityGlyph';
@@ -11,8 +11,8 @@ export function JourneyDetail({
 }: {
   id?: string;
   it: ShapedItinerary;
-  origin: StopHit;
-  dest: StopHit;
+  origin: LocationHit;
+  dest: LocationHit;
 }) {
   return (
     <div id={id} className="border-t border-line bg-ink-900/40 px-6 py-5 animate-reveal">

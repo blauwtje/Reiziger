@@ -1,17 +1,19 @@
-import type { StopHit } from '../types';
+import type { LocationHit, UserProfile } from '../types';
 import { StopSearch } from '../components/StopSearch';
 
 interface Props {
-  origin: StopHit | null;
-  dest: StopHit | null;
+  origin: LocationHit | null;
+  dest: LocationHit | null;
   arriveBy: string;
-  onOriginChange: (s: StopHit | null) => void;
-  onDestChange: (s: StopHit | null) => void;
+  onOriginChange: (s: LocationHit | null) => void;
+  onDestChange: (s: LocationHit | null) => void;
   onArriveByChange: (v: string) => void;
   onSwap: () => void;
   onSearch: () => void;
   loading: boolean;
   canSearch: boolean;
+  profile?: UserProfile | null;
+  onProfileChange?: (p: UserProfile) => void;
 }
 
 export function RailSearch({
