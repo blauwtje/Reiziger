@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import type { LocationHit, StopHit, AddressHit } from '../types';
-import { isStopHit } from '../types';
 import { api } from '../api';
 
 interface Props {

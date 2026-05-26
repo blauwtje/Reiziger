@@ -134,6 +134,42 @@ export function MijBoard({ profile, onProfileChange }: Props) {
             ))
           )}
         </SettingsBlock>
+
+        <SettingsBlock title="Agenda-koppeling">
+          <Row label="Google Agenda">
+            <button
+              onClick={() => window.open('https://calendar.google.com', '_blank')}
+              className="text-xs border border-line rounded px-2.5 py-1.5 text-fg-dim hover:text-fg transition"
+            >
+              Koppelen →
+            </button>
+          </Row>
+          <Row label="Apple Agenda" sub="Gebruik de export-knop in reisdetail">
+            <button
+              disabled
+              title="Gebruik de export-knop in reisdetail"
+              className="text-xs border border-line rounded px-2.5 py-1.5 text-fg-faint opacity-50 cursor-not-allowed"
+            >
+              Exporteer .ics
+            </button>
+          </Row>
+        </SettingsBlock>
+
+        <SettingsBlock title="Abonnementsadvies">
+          {profile.savedRoutes.length === 0 ? (
+            <p className="text-sm text-fg-faint py-2">Voeg vaste routes toe om een abonnementsadvies te zien.</p>
+          ) : profile.savedRoutes.length <= 2 ? (
+            <div className="py-2">
+              <div className="text-sm font-semibold text-fg mb-1">Dal Voordeel</div>
+              <div className="text-xs text-fg-dim">40% korting buiten de spits. Geschikt voor jouw reispatroon.</div>
+            </div>
+          ) : (
+            <div className="py-2">
+              <div className="text-sm font-semibold text-fg mb-1">Altijd Voordeel</div>
+              <div className="text-xs text-fg-dim">40% korting op alle ritten. Bij 3+ vaste routes meestal voordeliger.</div>
+            </div>
+          )}
+        </SettingsBlock>
       </div>
     </div>
   );

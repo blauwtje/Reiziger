@@ -109,6 +109,17 @@ export interface AddressHit {
   lon: number;
 }
 
+export interface HistoryEntry {
+  id: string;
+  from: string;
+  fromName: string;
+  to: string;
+  toName: string;
+  when: string;
+  dur: string;
+  date: string;
+}
+
 export type LocationHit = StopHit | AddressHit;
 
 export function isStopHit(h: LocationHit): h is StopHit {

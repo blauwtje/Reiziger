@@ -10,6 +10,7 @@ import type { TransferRule } from './rules/types';
 import { readProfile, writeProfile } from './profile/store';
 import { fetchDisruptions } from './disruptions/client';
 import { geocodeNL } from './geocode/nominatim';
+import { listHistory, addHistory } from './history/store';
 import { createServer as createNetServer } from 'node:net';
 import { writeFileSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
@@ -77,6 +78,14 @@ app.put('/api/profile', async (req) => {
 });
 
 app.get('/api/disruptions', async () => ({ disruptions: await fetchDisruptions() }));
+
+app.get('/api/history', async () => ({ history: listHistory() }));
+
+app.post('/api/history', async (req, reply) => {
+  addHistory(req.body as Omit<import('./history/store').HistoryEntry, 'id'>);
+  reply.code(201);
+  return { ok: true };
+});
 
 app.get('/api/geocode', async (req) => {
   const q = (req.query as { q?: string }).q;

@@ -1,4 +1,4 @@
-import type { StopHit, RouteHit, ShapedItinerary, TransferRule, UserProfile, Disruption, AddressHit } from './types';
+import type { StopHit, RouteHit, ShapedItinerary, TransferRule, UserProfile, Disruption, AddressHit, HistoryEntry } from './types';
 
 async function jget<T>(url: string): Promise<T> {
   const r = await fetch(url);
@@ -61,4 +61,6 @@ export const api = {
     jget<{ disruptions: Disruption[] }>('/api/disruptions').then((r) => r.disruptions),
   geocode: (q: string) =>
     jget<{ results: AddressHit[] }>(`/api/geocode?q=${encodeURIComponent(q)}`).then((r) => r.results),
+  history: () => jget<{ history: HistoryEntry[] }>('/api/history').then((r) => r.history),
+  addHistory: (entry: Omit<HistoryEntry, 'id'>) => jsend<{ ok: boolean }>('/api/history', 'POST', entry),
 };

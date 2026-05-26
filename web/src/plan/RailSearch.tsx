@@ -1,3 +1,4 @@
+import { useRef, useEffect, useState } from 'react';
 import type { LocationHit, UserProfile } from '../types';
 import { LocationSearch } from '../components/LocationSearch';
 
@@ -23,12 +24,76 @@ const DISCOUNT_LABELS: Record<string, string> = {
   'dal-vrij':        'Dal Vrij',
 };
 
+const DAY_NL = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
+const MONTH_NL = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+
+function formatDateTimeLabel(value: string): string {
+  if (!value) return '—';
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return value;
+  const day = DAY_NL[d.getDay()];
+  const date = d.getDate();
+  const month = MONTH_NL[d.getMonth()];
+  const time = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  return `${day} ${date} ${month} · ${time}`;
+}
+
+function MinOverstapField({ value, onChange }: { value: number; onChange: (n: number) => void }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint">
+        Min. overstap
+      </label>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full rounded-lg border border-line bg-ink-850 px-3 py-2.5 font-mono text-sm text-fg text-left hover:border-signal/40 transition"
+      >
+        {value} min
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 right-0 mt-1 rounded-lg border border-line bg-ink-800 p-2 flex items-center gap-2 z-10 shadow-lg">
+          <button
+            type="button"
+            onClick={() => onChange(Math.max(0, value - 1))}
+            className="h-7 w-7 rounded border border-line bg-ink-700 text-fg-dim hover:text-fg flex items-center justify-center text-base font-medium transition"
+          >
+            −
+          </button>
+          <span className="flex-1 text-center font-mono text-sm text-fg">{value}</span>
+          <button
+            type="button"
+            onClick={() => onChange(Math.min(30, value + 1))}
+            className="h-7 w-7 rounded border border-line bg-ink-700 text-fg-dim hover:text-fg flex items-center justify-center text-base font-medium transition"
+          >
+            +
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function RailSearch({
   origin, dest, arriveBy,
   onOriginChange, onDestChange, onArriveByChange,
   onSwap, onSearch, loading, canSearch,
   profile, onProfileChange,
 }: Props) {
+  const hiddenDateRef = useRef<HTMLInputElement>(null);
+
   return (
     <div className="flex flex-col h-full">
       <div className="p-5 pb-4 border-b border-line shrink-0">
@@ -66,16 +131,38 @@ export function RailSearch({
           placeholder="Station of adres…"
         />
 
-        <div>
-          <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint">
-            Aankomst
-          </label>
-          <input
-            type="datetime-local"
-            value={arriveBy}
-            onChange={(e) => onArriveByChange(e.target.value)}
-            className="w-full rounded-lg border border-line bg-ink-850 px-3 py-2.5 font-mono text-sm text-fg outline-none focus:border-signal/60 focus:ring-2 focus:ring-signal/20"
-          />
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint">
+              Aankomst
+            </label>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => hiddenDateRef.current?.showPicker?.()}
+                className="w-full rounded-lg border border-line bg-ink-850 px-3 py-2.5 font-mono text-sm text-fg text-left hover:border-signal/40 transition"
+              >
+                {formatDateTimeLabel(arriveBy)}
+              </button>
+              <input
+                ref={hiddenDateRef}
+                type="datetime-local"
+                value={arriveBy}
+                onChange={(e) => onArriveByChange(e.target.value)}
+                className="absolute inset-0 opacity-0 pointer-events-none"
+                tabIndex={-1}
+              />
+            </div>
+          </div>
+
+          {profile && onProfileChange ? (
+            <MinOverstapField
+              value={Math.round(profile.minTransferSec / 60)}
+              onChange={(n) => onProfileChange({ ...profile, minTransferSec: n * 60 })}
+            />
+          ) : (
+            <div />
+          )}
         </div>
 
         {profile && profile.discounts.length > 0 && (
@@ -100,15 +187,6 @@ export function RailSearch({
                   {DISCOUNT_LABELS[d.id] ?? d.id}
                 </button>
               ))}
-            </div>
-          </div>
-        )}
-
-        {profile && (
-          <div className="border-t border-line pt-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint">Min. overstap</span>
-              <span className="font-mono text-xs text-fg-dim">{Math.round(profile.minTransferSec / 60)} min globaal</span>
             </div>
           </div>
         )}

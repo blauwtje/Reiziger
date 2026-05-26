@@ -35,6 +35,26 @@ export function usePlanSearch({ discounts = [] }: { discounts?: string[] } = {})
       const r = await api.plan(locationToParam(origin), locationToParam(dest), arriveBy, discounts);
       r.sort((a, b) => b.startTime - a.startTime);
       setItineraries(r);
+
+      if (r.length > 0) {
+        const it = r[0];
+        const DAY_NL = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
+        const MONTH_NL = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+        const d = new Date(it.startTime);
+        const dateLabel = `${DAY_NL[d.getDay()]} ${d.getDate()} ${MONTH_NL[d.getMonth()]}`;
+        const durMin = Math.round(it.durationSec / 60);
+        const durStr = durMin >= 60 ? `${Math.floor(durMin / 60)}u ${durMin % 60}m` : `${durMin}m`;
+
+        api.addHistory({
+          from: locationToParam(origin),
+          fromName: origin.name,
+          to: locationToParam(dest),
+          toName: dest.name,
+          when: new Date(it.startTime).toISOString(),
+          dur: durStr,
+          date: dateLabel,
+        }).catch(() => {});
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {

@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from 'react';
 import type { ShapedItinerary, LocationHit, Disruption } from '../types';
-import { fmtTime, fmtDuration, fmtMin, bufferTone } from '../lib/format';
+import { fmtTime, fmtDuration } from '../lib/format';
 import { Flap } from '../components/Flap';
 import { ModalityRow } from '../components/ModalityGlyph';
 import { JourneyDetail } from './JourneyDetail';
@@ -12,10 +12,12 @@ export function ResultsBoard({
   itineraries,
   origin,
   dest,
+  onSave,
 }: {
   itineraries: ShapedItinerary[];
   origin: LocationHit;
   dest: LocationHit;
+  onSave?: () => void;
 }) {
   const [expanded, setExpanded] = useState<number | null>(0);
   const [disruptions, setDisruptions] = useState<Disruption[]>([]);
@@ -39,12 +41,40 @@ export function ResultsBoard({
   return (
     <div className="flex flex-col min-h-full">
       {/* Board header */}
-      <div className="px-6 py-4 border-b border-line shrink-0">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint mb-1">Resultaten</div>
-        <div className="text-base font-semibold text-fg">
-          {origin.name}
-          <span className="text-fg-faint mx-2 font-normal">→</span>
-          {dest.name}
+      <div className="px-6 py-4 border-b border-line shrink-0 flex items-center gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint mb-1">Resultaten</div>
+          <div className="text-base font-semibold text-fg">
+            {origin.name}
+            <span className="text-fg-faint mx-2 font-normal">→</span>
+            {dest.name}
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={onSave}
+            disabled={!onSave}
+            title="Bewaar reis"
+            className="flex items-center gap-1.5 rounded-md border border-line bg-transparent px-2.5 py-1.5 text-xs text-fg-dim hover:text-fg transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+            Bewaar reis
+          </button>
+          <button
+            disabled
+            title="Gebruik de reisdetail voor agenda-export"
+            className="flex items-center gap-1.5 rounded-md border border-line bg-transparent px-2.5 py-1.5 text-xs text-fg-dim opacity-40 cursor-not-allowed"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            Naar agenda
+          </button>
         </div>
       </div>
 
