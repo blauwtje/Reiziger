@@ -57,10 +57,11 @@ export function ResultsBoard({
               index={i}
               isFirst={i === 0}
               expanded={expanded === i}
-              onToggle={() => setExpanded(expanded === i ? null : i)}
+              detailId={`journey-detail-${i}`}
+              onToggle={() => setExpanded((prev) => (prev === i ? null : i))}
             />
             {expanded === i && (
-              <JourneyDetail it={it} origin={origin} dest={dest} />
+              <JourneyDetail id={`journey-detail-${i}`} it={it} origin={origin} dest={dest} />
             )}
           </Fragment>
         ))}
@@ -74,12 +75,14 @@ function ResultRow({
   index,
   isFirst,
   expanded,
+  detailId,
   onToggle,
 }: {
   it: ShapedItinerary;
   index: number;
   isFirst: boolean;
   expanded: boolean;
+  detailId: string;
   onToggle: () => void;
 }) {
   const firstTransit = it.legs.find((l) => l.transit);
@@ -97,6 +100,7 @@ function ResultRow({
       onClick={onToggle}
       role="button"
       aria-expanded={expanded}
+      aria-controls={detailId}
     >
       {/* Vertrek */}
       <div className="flex flex-col gap-1">

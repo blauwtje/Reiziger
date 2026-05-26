@@ -4,16 +4,18 @@ import { Flap } from '../components/Flap';
 import { ModalityGlyph } from '../components/ModalityGlyph';
 
 export function JourneyDetail({
+  id,
   it,
   origin,
   dest,
 }: {
+  id?: string;
   it: ShapedItinerary;
   origin: StopHit;
   dest: StopHit;
 }) {
   return (
-    <div className="border-t border-line bg-ink-900/40 px-6 py-5 animate-reveal">
+    <div id={id} className="border-t border-line bg-ink-900/40 px-6 py-5 animate-reveal">
       {/* Summary */}
       <div className="flex flex-wrap items-start gap-x-8 gap-y-3 mb-5 pb-4 border-b border-line/60">
         <div>
