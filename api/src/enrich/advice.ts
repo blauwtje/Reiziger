@@ -44,8 +44,14 @@ export async function computeAdvice(routes: SavedRoute[]): Promise<Advice> {
   const baseFares: number[] = [];
   const tripsPerMonth: number[] = [];
 
+  const nextMonday = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + ((8 - d.getDay()) % 7 || 7));
+    return d.toISOString().slice(0, 10);
+  })();
+
   for (const route of routes) {
-    const arriveBy = '2026-06-02T09:00';
+    const arriveBy = `${nextMonday}T09:00`;
 
     const from = route.fromGtfsId.startsWith('addr:')
       ? route.fromGtfsId.slice(5)
