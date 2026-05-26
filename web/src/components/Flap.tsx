@@ -1,5 +1,5 @@
-type FlapSize = 'sm' | 'md' | 'lg' | 'xl';
-type FlapTone = 'fg' | 'signal' | 'late';
+export type FlapSize = 'sm' | 'md' | 'lg' | 'xl';
+export type FlapTone = 'fg' | 'signal' | 'late';
 
 const SIZE: Record<FlapSize, string> = {
   sm: 'text-sm px-2 py-1',
