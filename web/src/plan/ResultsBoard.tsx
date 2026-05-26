@@ -1,9 +1,12 @@
-import { Fragment, useState } from 'react';
-import type { ShapedItinerary, LocationHit } from '../types';
+import { Fragment, useEffect, useState } from 'react';
+import type { ShapedItinerary, LocationHit, Disruption } from '../types';
 import { fmtTime, fmtDuration, fmtMin, bufferTone } from '../lib/format';
 import { Flap } from '../components/Flap';
 import { ModalityRow } from '../components/ModalityGlyph';
 import { JourneyDetail } from './JourneyDetail';
+import { api } from '../api';
+
+const GRID = 'grid-cols-[110px_110px_100px_1fr_120px_110px_32px]';
 
 export function ResultsBoard({
   itineraries,
@@ -15,6 +18,13 @@ export function ResultsBoard({
   dest: LocationHit;
 }) {
   const [expanded, setExpanded] = useState<number | null>(0);
+  const [disruptions, setDisruptions] = useState<Disruption[]>([]);
+
+  useEffect(() => { api.disruptions().then(setDisruptions).catch(() => {}); }, []);
+
+  const timeRange = itineraries.length > 0
+    ? `${fmtTime(itineraries[0].startTime)} – ${fmtTime(itineraries[itineraries.length - 1].startTime)}`
+    : '';
 
   if (itineraries.length === 0) {
     return (
@@ -38,13 +48,16 @@ export function ResultsBoard({
         </div>
       </div>
 
+      <DisruptionStrip disruptions={disruptions} />
+
       {/* Column headers */}
-      <div className="grid grid-cols-[100px_100px_100px_1fr_180px_32px] gap-x-4 px-6 py-2.5 border-b border-line text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint sticky top-0 bg-ink-950/95 backdrop-blur z-10 shrink-0">
+      <div className={`grid ${GRID} gap-x-4 px-6 py-2.5 border-b border-line text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-faint sticky top-0 bg-ink-950/95 backdrop-blur z-10 shrink-0`}>
         <span>Vertrek</span>
         <span>Aank</span>
         <span>Duur</span>
-        <span>Via</span>
-        <span>Buffer</span>
+        <span>Overstap</span>
+        <span>Spoor</span>
+        <span className="text-right">Prijs</span>
         <span />
       </div>
 
@@ -66,17 +79,37 @@ export function ResultsBoard({
           </Fragment>
         ))}
       </div>
+
+      <BoardFooter count={itineraries.length} timeRange={timeRange} />
+    </div>
+  );
+}
+
+function DisruptionStrip({ disruptions }: { disruptions: Disruption[] }) {
+  if (disruptions.length === 0) return null;
+  return (
+    <div className="border-b border-line shrink-0">
+      {disruptions.map((d) => (
+        <div key={d.id} className="flex items-center gap-3 px-6 py-2.5 bg-late-bg/60">
+          <span className="shrink-0 rounded px-1.5 py-0.5 bg-late-bg text-late text-[10px] font-bold uppercase tracking-[0.08em]">Storing</span>
+          <span className="text-sm text-fg flex-1 truncate">{d.title}</span>
+          {d.until && <span className="font-mono text-[11px] text-fg-dim shrink-0">tot {d.until}</span>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BoardFooter({ count, timeRange }: { count: number; timeRange: string }) {
+  return (
+    <div className="shrink-0 flex items-center gap-3 px-6 py-3 border-t border-line bg-ink-950/70 text-xs text-fg-faint">
+      <span className="font-mono">{count} reizen · {timeRange}</span>
     </div>
   );
 }
 
 function ResultRow({
-  it,
-  index,
-  isFirst,
-  expanded,
-  detailId,
-  onToggle,
+  it, index, isFirst, expanded, detailId, onToggle,
 }: {
   it: ShapedItinerary;
   index: number;
@@ -86,12 +119,15 @@ function ResultRow({
   onToggle: () => void;
 }) {
   const firstTransit = it.legs.find((l) => l.transit);
+  const lastTransit = [...it.legs].reverse().find((l) => l.transit);
+  const depPlatform = firstTransit?.fromPlatform;
+  const arrPlatform = lastTransit?.toPlatform;
   const delayMin = firstTransit ? Math.round(firstTransit.departureDelaySec / 60) : 0;
   const transitModes = it.legs.filter((l) => l.transit).map((l) => l.mode);
 
   return (
     <div
-      className={`grid grid-cols-[100px_100px_100px_1fr_180px_32px] gap-x-4 items-center px-6 py-4 border-b border-line cursor-pointer select-none transition-colors animate-reveal
+      className={`grid ${GRID} gap-x-4 items-center px-6 py-4 border-b border-line cursor-pointer select-none transition-colors animate-reveal
         ${isFirst
           ? 'bg-gradient-to-r from-signal/5 via-transparent to-transparent border-l-2 border-l-signal'
           : 'border-l-2 border-l-transparent hover:bg-ink-900/40'}
@@ -127,7 +163,7 @@ function ResultRow({
         </span>
       </div>
 
-      {/* Via */}
+      {/* Overstap */}
       <div className="flex flex-col gap-1.5 min-w-0">
         <ModalityRow modes={transitModes} />
         {it.transferDetails.length > 0 && (
@@ -137,22 +173,25 @@ function ResultRow({
         )}
       </div>
 
-      {/* Buffer */}
-      <div className="flex flex-col gap-1">
-        {it.transferDetails.length === 0 ? (
-          <span className="text-xs text-fg-faint">Direct</span>
+      {/* Spoor */}
+      <div className="flex items-center gap-1.5 font-mono text-sm">
+        {depPlatform && <span className="px-1.5 py-0.5 rounded bg-ink-700 border border-line text-fg-dim">{depPlatform}</span>}
+        {depPlatform && arrPlatform && <span className="text-fg-faint">→</span>}
+        {arrPlatform && <span className="px-1.5 py-0.5 rounded bg-ink-700 border border-line text-fg-dim">{arrPlatform}</span>}
+        {!depPlatform && !arrPlatform && <span className="text-fg-faint">—</span>}
+      </div>
+
+      {/* Prijs */}
+      <div className="flex flex-col items-end gap-0.5">
+        {it.discountFareEuros !== null ? (
+          <>
+            <span className="font-mono text-sm font-semibold text-fg">€ {it.discountFareEuros.toFixed(2).replace('.', ',')}</span>
+            {it.fareEuros !== it.discountFareEuros && (
+              <span className="font-mono text-[10px] text-fg-faint line-through">€ {it.fareEuros?.toFixed(2).replace('.', ',')}</span>
+            )}
+          </>
         ) : (
-          it.transferDetails.slice(0, 2).map((t, i) => {
-            const tone = bufferTone(t.bufferSec);
-            return (
-              <span
-                key={i}
-                className={`font-mono text-[11px] px-1.5 py-0.5 rounded ring-1 w-fit ${tone.text} ${tone.ring}`}
-              >
-                {fmtMin(t.bufferSec)} · {t.atStopName.split(/[\s,]/)[0]}
-              </span>
-            );
-          })
+          <span className="text-xs text-fg-faint">—</span>
         )}
       </div>
 
