@@ -41,7 +41,15 @@ app.post('/api/plan', async (req, reply) => {
     reply.code(400);
     return { error: 'from, to, and arriveBy (ISO local datetime, e.g. 2026-05-27T09:00) are required' };
   }
-  return { itineraries: await planArriveBy(body.from, body.to, body.arriveBy, body.num ?? 6, body.discounts ?? []) };
+  const profile = readProfile();
+  return { itineraries: await planArriveBy(
+    body.from, body.to, body.arriveBy, body.num ?? 6, body.discounts ?? [],
+    {
+      minTransferSec: profile.minTransferSec,
+      walkSpeedKmh: profile.walkSpeedKmh,
+      bikeSpeedKmh: profile.bikeSpeedKmh,
+    },
+  ) };
 });
 
 app.get('/api/rules', async () => ({ rules: await listRules() }));

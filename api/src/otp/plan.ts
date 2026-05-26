@@ -62,7 +62,7 @@ export interface ShapedItinerary {
 }
 
 const PLAN_QUERY = `
-query Plan($from: String!, $to: String!, $date: String!, $time: String!, $arriveBy: Boolean!, $num: Int!) {
+query Plan($from: String!, $to: String!, $date: String!, $time: String!, $arriveBy: Boolean!, $num: Int!, $walkSpeed: Float, $bikeSpeed: Float, $minTransferTime: Int) {
   plan(
     fromPlace: $from
     toPlace: $to
@@ -70,7 +70,10 @@ query Plan($from: String!, $to: String!, $date: String!, $time: String!, $arrive
     time: $time
     arriveBy: $arriveBy
     numItineraries: $num
-    transportModes: [{ mode: TRANSIT }, { mode: WALK }]
+    walkSpeed: $walkSpeed
+    bikeSpeed: $bikeSpeed
+    minTransferTime: $minTransferTime
+    transportModes: [{ mode: TRANSIT }, { mode: WALK }, { mode: BICYCLE, qualifier: PARK }]
   ) {
     routingErrors { code description }
     itineraries {
@@ -175,16 +178,25 @@ export async function planArriveBy(
   arrivalIsoLocal: string,
   num = 6,
   discounts: string[] = [],
+  options?: {
+    minTransferSec?: number;
+    walkSpeedKmh?: number;
+    bikeSpeedKmh?: number;
+  },
 ): Promise<ShapedItinerary[]> {
   const { date, time } = splitDateTime(arrivalIsoLocal);
-  const data = await gql<RawPlan>(PLAN_QUERY, {
+  const vars: Record<string, unknown> = {
     from: fromStopGtfsId,
     to: toStopGtfsId,
     date,
     time,
     arriveBy: true,
     num,
-  });
+  };
+  if (options?.walkSpeedKmh != null) vars.walkSpeed = options.walkSpeedKmh / 3.6;
+  if (options?.bikeSpeedKmh != null) vars.bikeSpeed = options.bikeSpeedKmh / 3.6;
+  if (options?.minTransferSec != null) vars.minTransferTime = options.minTransferSec;
+  const data = await gql<RawPlan>(PLAN_QUERY, vars);
   const itineraries = data.plan?.itineraries ?? [];
   return itineraries.map((it) => {
     const legs = it.legs.map(shapeLeg);
