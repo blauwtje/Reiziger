@@ -26,8 +26,11 @@ export interface ShapedLeg {
   headsign: string | null;
   fromName: string;
   fromStopGtfsId: string | null;
+  fromPlatform: string | null;
   toName: string;
   toStopGtfsId: string | null;
+  toPlatform: string | null;
+  distanceM: number;
   startTime: number; // epoch ms
   endTime: number; // epoch ms
   realTime: boolean;
@@ -72,15 +75,16 @@ query Plan($from: String!, $to: String!, $date: String!, $time: String!, $arrive
       numberOfTransfers
       legs {
         mode
+        distance
         startTime
         endTime
         realTime
         departureDelay
         arrivalDelay
-        from { name stop { gtfsId } }
-        to { name stop { gtfsId } }
+        from { name stop { gtfsId platformCode } }
+        to   { name stop { gtfsId platformCode } }
         route { gtfsId shortName longName mode }
-        trip { gtfsId tripHeadsign }
+        trip  { gtfsId tripHeadsign }
       }
     }
   }
@@ -88,15 +92,16 @@ query Plan($from: String!, $to: String!, $date: String!, $time: String!, $arrive
 
 interface RawLeg {
   mode: string;
+  distance: number;
   startTime: number;
   endTime: number;
   realTime: boolean;
   departureDelay: number | null;
   arrivalDelay: number | null;
-  from: { name: string; stop: { gtfsId: string } | null };
-  to: { name: string; stop: { gtfsId: string } | null };
+  from: { name: string; stop: { gtfsId: string; platformCode: string | null } | null };
+  to:   { name: string; stop: { gtfsId: string; platformCode: string | null } | null };
   route: { gtfsId: string; shortName: string | null; longName: string | null; mode: string } | null;
-  trip: { gtfsId: string; tripHeadsign: string | null } | null;
+  trip:  { gtfsId: string; tripHeadsign: string | null } | null;
 }
 
 interface RawPlan {
@@ -129,8 +134,11 @@ function shapeLeg(leg: RawLeg): ShapedLeg {
     headsign: leg.trip?.tripHeadsign ?? null,
     fromName: leg.from.name,
     fromStopGtfsId: leg.from.stop?.gtfsId ?? null,
+    fromPlatform: leg.from.stop?.platformCode ?? null,
     toName: leg.to.name,
     toStopGtfsId: leg.to.stop?.gtfsId ?? null,
+    toPlatform: leg.to.stop?.platformCode ?? null,
+    distanceM: leg.distance,
     startTime: leg.startTime,
     endTime: leg.endTime,
     realTime: Boolean(leg.realTime),

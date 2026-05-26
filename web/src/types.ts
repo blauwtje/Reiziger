@@ -24,8 +24,11 @@ export interface ShapedLeg {
   headsign: string | null;
   fromName: string;
   fromStopGtfsId: string | null;
+  fromPlatform: string | null;
   toName: string;
   toStopGtfsId: string | null;
+  toPlatform: string | null;
+  distanceM: number;
   startTime: number;
   endTime: number;
   realTime: boolean;
