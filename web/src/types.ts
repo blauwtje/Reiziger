@@ -66,3 +66,27 @@ export interface TransferRule {
   minBufferSec: number;
   enabled: boolean;
 }
+
+export interface Discount {
+  id: 'dal-voordeel' | 'altijd-voordeel' | 'ov-jaarkaart' | 'dal-vrij';
+  active: boolean;
+}
+
+export interface SavedRoute {
+  id: string;
+  label: string;
+  fromGtfsId: string;
+  fromName: string;
+  toGtfsId: string;
+  toName: string;
+  daysOfWeek: number[];
+}
+
+export interface UserProfile {
+  minTransferSec: number;
+  walkSpeedKmh: number;
+  bikeSpeedKmh: number;
+  discounts: Discount[];
+  savedRoutes: SavedRoute[];
+  theme: 'dark' | 'light';
+}

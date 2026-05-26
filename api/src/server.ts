@@ -7,6 +7,7 @@ import { listRules, createRule, updateRule, deleteRule } from './rules/store';
 import { compileTransfers } from './compile/gtfs';
 import { startRebuild, getRebuildState } from './otp/rebuild';
 import type { TransferRule } from './rules/types';
+import { readProfile, writeProfile } from './profile/store';
 import { createServer as createNetServer } from 'node:net';
 import { writeFileSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
@@ -61,6 +62,16 @@ app.delete('/api/rules/:id', async (req, reply) => {
     return { error: 'rule not found' };
   }
   return { ok: true };
+});
+
+app.get('/api/profile', async () => readProfile());
+
+app.put('/api/profile', async (req) => {
+  const incoming = req.body as Partial<import('./profile/types').UserProfile>;
+  const current = readProfile();
+  const updated = { ...current, ...incoming };
+  writeProfile(updated);
+  return updated;
 });
 
 // Write transfers.txt from current rules (no rebuild) — handy for inspection.

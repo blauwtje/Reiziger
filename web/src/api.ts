@@ -1,4 +1,4 @@
-import type { StopHit, RouteHit, ShapedItinerary, TransferRule } from './types';
+import type { StopHit, RouteHit, ShapedItinerary, TransferRule, UserProfile } from './types';
 
 async function jget<T>(url: string): Promise<T> {
   const r = await fetch(url);
@@ -53,4 +53,8 @@ export const api = {
   deleteRule: (id: number) => jsend<{ ok: boolean }>(`/api/rules/${id}`, 'DELETE'),
   rebuild: () => jsend<{ started: boolean }>('/api/rebuild', 'POST'),
   rebuildStatus: () => jget<RebuildStatus>('/api/rebuild/status'),
+  profile: () =>
+    jget<UserProfile>('/api/profile'),
+  updateProfile: (patch: Partial<UserProfile>) =>
+    jsend<UserProfile>('/api/profile', 'PUT', patch),
 };
