@@ -39,7 +39,7 @@ export function JourneyDetail({
       <ol className="space-y-0">
         {it.legs.map((l, i) =>
           l.transit ? (
-            <TransitLeg key={i} l={l} isLast={i === it.legs.length - 1} />
+            <TransitLeg key={i} l={l} />
           ) : (
             <WalkLeg key={i} l={l} />
           ),
@@ -77,7 +77,7 @@ export function JourneyDetail({
   );
 }
 
-function TransitLeg({ l, isLast }: { l: ShapedLeg; isLast: boolean }) {
+function TransitLeg({ l }: { l: ShapedLeg }) {
   const delayMin = Math.round(l.departureDelaySec / 60);
   return (
     <li className="flex items-start gap-3 py-2.5 border-b border-line/40 last:border-0">
