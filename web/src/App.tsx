@@ -5,6 +5,7 @@ import { usePlanSearch } from './plan/usePlanSearch';
 import { RailSearch } from './plan/RailSearch';
 import { ResultsBoard } from './plan/ResultsBoard';
 import { RailMij } from './mij/RailMij';
+import { MijBoard } from './mij/MijBoard';
 import { BoardToday } from './vandaag/BoardToday';
 
 type Tab = 'plan' | 'vandaag' | 'bewaard' | 'mij';
@@ -138,7 +139,7 @@ export function App() {
               ) : null}
             </>
           ) : tab === 'mij' ? (
-            <MijBoard />
+            <MijBoard profile={profile} onProfileChange={(p) => { setProfile(p); api.updateProfile(p); }} />
           ) : tab === 'vandaag' ? (
             <BoardToday profile={profile} />
           ) : (
@@ -167,14 +168,6 @@ function BoardIdle() {
         <path d="M9 26l-2 2M23 26l2 2"/>
       </svg>
       <p className="text-sm">Voer een vertrek- en bestemmingsstation in en klik op <strong className="text-fg-dim">Plan reis</strong>.</p>
-    </div>
-  );
-}
-
-function MijBoard() {
-  return (
-    <div className="flex flex-col items-center justify-center h-full gap-2 text-center px-12 py-20 text-fg-faint">
-      <p className="text-sm">Beheer je overstapbuffers in het linkerpaneel.</p>
     </div>
   );
 }
