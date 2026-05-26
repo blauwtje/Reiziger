@@ -1,4 +1,4 @@
-import type { StopHit, RouteHit, ShapedItinerary, TransferRule, UserProfile } from './types';
+import type { StopHit, RouteHit, ShapedItinerary, TransferRule, UserProfile, Disruption, AddressHit } from './types';
 
 async function jget<T>(url: string): Promise<T> {
   const r = await fetch(url);
@@ -57,4 +57,8 @@ export const api = {
     jget<UserProfile>('/api/profile'),
   updateProfile: (patch: Partial<UserProfile>) =>
     jsend<UserProfile>('/api/profile', 'PUT', patch),
+  disruptions: () =>
+    jget<{ disruptions: Disruption[] }>('/api/disruptions').then((r) => r.disruptions),
+  geocode: (q: string) =>
+    jget<{ results: AddressHit[] }>(`/api/geocode?q=${encodeURIComponent(q)}`).then((r) => r.results),
 };

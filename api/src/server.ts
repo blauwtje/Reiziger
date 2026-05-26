@@ -8,6 +8,8 @@ import { compileTransfers } from './compile/gtfs';
 import { startRebuild, getRebuildState } from './otp/rebuild';
 import type { TransferRule } from './rules/types';
 import { readProfile, writeProfile } from './profile/store';
+import { fetchDisruptions } from './disruptions/client';
+import { geocodeNL } from './geocode/nominatim';
 import { createServer as createNetServer } from 'node:net';
 import { writeFileSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
@@ -72,6 +74,14 @@ app.put('/api/profile', async (req) => {
   const updated = { ...current, ...incoming };
   writeProfile(updated);
   return updated;
+});
+
+app.get('/api/disruptions', async () => ({ disruptions: await fetchDisruptions() }));
+
+app.get('/api/geocode', async (req) => {
+  const q = (req.query as { q?: string }).q;
+  if (!q || q.trim().length < 3) return { results: [] };
+  return { results: await geocodeNL(q.trim()) };
 });
 
 // Write transfers.txt from current rules (no rebuild) — handy for inspection.

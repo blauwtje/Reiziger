@@ -90,3 +90,27 @@ export interface UserProfile {
   savedRoutes: SavedRoute[];
   theme: 'dark' | 'light';
 }
+
+export interface Disruption {
+  id: string;
+  title: string;
+  body: string;
+  severity: 'low' | 'medium' | 'high';
+  modality: string;
+  area: string;
+  until: string | null;
+  affectsRoutes: string[];
+}
+
+export interface AddressHit {
+  name: string;
+  displayName: string;
+  lat: number;
+  lon: number;
+}
+
+export type LocationHit = StopHit | AddressHit;
+
+export function isStopHit(h: LocationHit): h is StopHit {
+  return 'gtfsId' in h;
+}
