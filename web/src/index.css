@@ -28,6 +28,12 @@
   --color-fg: #eef3f9;
   --color-fg-dim: #9aabbe;
   --color-fg-faint: #5c6c7e;
+
+  --color-signal-bg:   rgba(255, 201, 23, 0.10);
+  --color-signal-line: rgba(255, 201, 23, 0.35);
+  --color-ok-bg:       rgba(22, 199, 154, 0.13);
+  --color-warn-bg:     rgba(255, 176, 32, 0.13);
+  --color-late-bg:     rgba(255, 91, 82, 0.14);
 }
 
 @layer base {
@@ -53,6 +59,38 @@
     background-size: 22px 22px;
   }
   ::selection { background: var(--color-signal); color: #1a1300; }
+}
+
+[data-theme="light"] {
+  --color-ink-950: #ece7dd;
+  --color-ink-900: #e5dfd5;
+  --color-ink-850: #f5f1e8;
+  --color-ink-800: #f9f6f0;
+  --color-ink-700: #e3ddd0;
+  --color-ink-600: #dad3c4;
+  --color-line:    #c9c0ad;
+
+  --color-signal:      #b48400;
+  --color-signal-soft: #c8980f;
+  --color-signal-bg:   rgba(180, 132, 0, 0.10);
+  --color-signal-line: rgba(180, 132, 0, 0.35);
+
+  --color-fg:        #1b1f27;
+  --color-fg-dim:    #5c6573;
+  --color-fg-faint:  #8a8e96;
+
+  --color-rail:  #b48400;
+  --color-bus:   #1c6bc7;
+  --color-tram:  #0f8a6b;
+  --color-metro: #c9461f;
+  --color-ferry: #5b6cc7;
+
+  --color-ok:      #0f8a6b;
+  --color-warn:    #b87010;
+  --color-late:    #c93a32;
+  --color-ok-bg:   rgba(15, 138, 107, 0.10);
+  --color-warn-bg: rgba(184, 112, 16, 0.12);
+  --color-late-bg: rgba(201, 58, 50, 0.10);
 }
 
 @layer utilities {
