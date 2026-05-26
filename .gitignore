@@ -28,6 +28,13 @@ api/data/
 .playwright-mcp/
 reiziger-*.png
 
+# Design source material (local only)
+design_bundle/
+design_raw.txt
+
+# Runtime port file
+api/.dev-port
+
 # editor / OS
 .DS_Store
 .vscode/
