@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --color-ink-950: #0a0d12;
+  --color-ink-900: #0f141b;
+  --color-ink-850: #141a23;
+  --color-ink-800: #1a212c;
+  --color-ink-700: #232c39;
+  --color-ink-600: #313c4c;
+  --color-line: #28303d;
+
+  --color-signal: #ffc917;
+  --color-signal-soft: #ffd750;
+
+  --color-rail: #ffc917;
+  --color-bus: #3f9bff;
+  --color-tram: #16c79a;
+  --color-metro: #ff6a3d;
+  --color-ferry: #8b9bff;
+
+  --color-ok: #16c79a;
+  --color-warn: #ffb020;
+  --color-late: #ff5b52;
+
+  --color-fg: #eef3f9;
+  --color-fg-dim: #9aabbe;
+  --color-fg-faint: #5c6c7e;
+}
+
+@layer base {
+  html { color-scheme: dark; }
+  body {
+    background-color: var(--color-ink-950);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(900px 520px at 88% -12%, rgba(255, 201, 23, 0.07), transparent 60%),
+      radial-gradient(720px 520px at -5% -5%, rgba(63, 155, 255, 0.05), transparent 55%);
+    background-attachment: fixed;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  ::selection { background: var(--color-signal); color: #1a1300; }
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes flap-in {
+  0% { opacity: 0; transform: translateY(-45%) scaleY(0.35); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+.animate-reveal { animation: reveal 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.animate-flap { animation: flap-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+* { scrollbar-width: thin; scrollbar-color: var(--color-ink-700) transparent; }

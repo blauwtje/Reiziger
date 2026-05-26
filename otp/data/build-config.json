@@ -1,0 +1,10 @@
+{
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "feedId": "ovapi",
+      "source": "gtfs"
+    }
+  ],
+  "transitModelTimeZone": "Europe/Amsterdam"
+}

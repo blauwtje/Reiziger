@@ -1,0 +1,62 @@
+# Reiziger — local stack.
+#
+# v1 dev loop: run ONLY OTP here (`docker compose up -d otp`) and run the
+# api + web on the host with `npm run dev` for hot reload. The api triggers
+# OTP graph rebuilds via `npm run otp:rebuild` (see scripts/rebuild.mjs).
+#
+# The api/web service defs below are for a future fully-containerized deploy.
+services:
+  otp:
+    image: opentripplanner/opentripplanner@sha256:149330b3d7b3dc5708189f5b99d456521706e66b5593d2d84f0a5d5302df26cc # OTP 2.10.0-SNAPSHOT, pinned + verified 2026-05-26
+    container_name: reiziger-otp
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./otp/data:/var/opentripplanner
+    environment:
+      # NL GTFS-only graph fits comfortably; cap heap to leave room for the host.
+      - JAVA_TOOL_OPTIONS=-Xmx8g
+    # NOTE: the image entrypoint already appends the base dir (/var/opentripplanner/),
+    # so we pass ONLY flags here — adding a dir would be a second positional and fail.
+    command: ["--load", "--serve"]
+    restart: unless-stopped
+
+  # One-shot graph builder. Run with: docker compose run --rm otp-build
+  # (command is baked in here so we never type `--build` on the CLI, which
+  # docker compose would otherwise interpret as its own image-build flag).
+  otp-build:
+    image: opentripplanner/opentripplanner@sha256:149330b3d7b3dc5708189f5b99d456521706e66b5593d2d84f0a5d5302df26cc # OTP 2.10.0-SNAPSHOT, pinned + verified 2026-05-26
+    profiles: ["build"]
+    volumes:
+      - ./otp/data:/var/opentripplanner
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xmx8g
+    command: ["--build", "--save"]
+
+  # --- future containerized deploy (not used in the v1 dev loop) ---
+  api:
+    build: ./api
+    container_name: reiziger-api
+    profiles: ["full"]
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./otp/data:/data/otp
+      - ./api/db:/data/db
+    environment:
+      - OTP_URL=http://otp:8080
+      - OTP_DATA_DIR=/data/otp
+      - DB_PATH=/data/db/rules.db
+    depends_on:
+      - otp
+    restart: unless-stopped
+
+  web:
+    build: ./web
+    container_name: reiziger-web
+    profiles: ["full"]
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+    restart: unless-stopped

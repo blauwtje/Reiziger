@@ -1,0 +1,34 @@
+# OTP data — ignore everything except the JSON configs.
+# Feeds (gtfs/, *.zip) and the built graph (*.obj) are large and regenerable
+# via `npm run refresh`. NEVER commit otp/data/gtfs/ (it's ~1 GB of text).
+otp/data/*
+!otp/data/build-config.json
+!otp/data/router-config.json
+
+# Node
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+
+# SQLite rules db + runtime rule state (rules are local, not source)
+*.db
+*.sqlite
+*.sqlite3
+api/db/
+api/data/
+
+# env
+.env
+.env.*
+!.env.example
+
+# playwright local output + throwaway screenshots
+.playwright-mcp/
+reiziger-*.png
+
+# editor / OS
+.DS_Store
+.vscode/
+.idea/

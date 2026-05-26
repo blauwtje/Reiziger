@@ -1,0 +1,22 @@
+{
+  "updaters": [
+    {
+      "type": "stop-time-updater",
+      "feedId": "ovapi",
+      "url": "https://gtfs.ovapi.nl/nl/tripUpdates.pb",
+      "frequency": "60s"
+    },
+    {
+      "type": "real-time-alerts",
+      "feedId": "ovapi",
+      "url": "https://gtfs.ovapi.nl/nl/alerts.pb",
+      "frequency": "60s"
+    },
+    {
+      "type": "vehicle-positions",
+      "feedId": "ovapi",
+      "url": "https://gtfs.ovapi.nl/nl/vehiclePositions.pb",
+      "frequency": "60s"
+    }
+  ]
+}

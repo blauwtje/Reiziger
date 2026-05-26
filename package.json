@@ -1,0 +1,22 @@
+{
+  "name": "reiziger",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "api",
+    "web"
+  ],
+  "scripts": {
+    "otp:up": "docker compose up -d otp",
+    "otp:down": "docker compose down",
+    "otp:build": "docker compose run --rm otp-build",
+    "otp:rebuild": "docker compose stop otp && docker compose run --rm otp-build && docker compose up -d otp",
+    "otp:logs": "docker compose logs -f otp",
+    "dev:api": "npm -w api run dev",
+    "dev:web": "npm -w web run dev",
+    "compile": "npm -w api run compile",
+    "refresh": "bash scripts/refresh.sh",
+    "test": "npm -w api run test"
+  }
+}
