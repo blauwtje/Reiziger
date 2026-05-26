@@ -1,4 +1,5 @@
 import { gql } from './client';
+import { calcCo2 } from '../enrich/co2';
 
 export interface StopHit {
   gtfsId: string;
@@ -54,6 +55,7 @@ export interface ShapedItinerary {
   hasRealtime: boolean;
   legs: ShapedLeg[];
   transferDetails: ShapedTransfer[];
+  co2Grams: number;
 }
 
 const PLAN_QUERY = `
@@ -190,6 +192,7 @@ export async function planArriveBy(
       hasRealtime: legs.some((l) => l.realTime),
       legs,
       transferDetails: transferDetails(legs),
+      co2Grams: calcCo2(legs),
     };
   });
 }

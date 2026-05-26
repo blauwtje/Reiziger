@@ -51,6 +51,7 @@ export interface ShapedItinerary {
   hasRealtime: boolean;
   legs: ShapedLeg[];
   transferDetails: ShapedTransfer[];
+  co2Grams: number;
 }
 
 export interface TransferRule {
