@@ -5,6 +5,7 @@ import { usePlanSearch } from './plan/usePlanSearch';
 import { RailSearch } from './plan/RailSearch';
 import { ResultsBoard } from './plan/ResultsBoard';
 import { RailMij } from './mij/RailMij';
+import { BoardToday } from './vandaag/BoardToday';
 
 type Tab = 'plan' | 'vandaag' | 'bewaard' | 'mij';
 
@@ -138,6 +139,8 @@ export function App() {
             </>
           ) : tab === 'mij' ? (
             <MijBoard />
+          ) : tab === 'vandaag' ? (
+            <BoardToday profile={profile} />
           ) : (
             <ComingSoon tab={tab} />
           )}
