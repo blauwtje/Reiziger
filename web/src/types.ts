@@ -52,6 +52,8 @@ export interface ShapedItinerary {
   legs: ShapedLeg[];
   transferDetails: ShapedTransfer[];
   co2Grams: number;
+  fareEuros: number | null;
+  discountFareEuros: number | null;
 }
 
 export interface TransferRule {

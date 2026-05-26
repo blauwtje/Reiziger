@@ -1,5 +1,6 @@
 import { gql } from './client';
 import { calcCo2 } from '../enrich/co2';
+import { calcFare } from '../enrich/fare';
 
 export interface StopHit {
   gtfsId: string;
@@ -56,6 +57,8 @@ export interface ShapedItinerary {
   legs: ShapedLeg[];
   transferDetails: ShapedTransfer[];
   co2Grams: number;
+  fareEuros: number | null;
+  discountFareEuros: number | null;
 }
 
 const PLAN_QUERY = `
@@ -171,6 +174,7 @@ export async function planArriveBy(
   toStopGtfsId: string,
   arrivalIsoLocal: string,
   num = 6,
+  discounts: string[] = [],
 ): Promise<ShapedItinerary[]> {
   const { date, time } = splitDateTime(arrivalIsoLocal);
   const data = await gql<RawPlan>(PLAN_QUERY, {
@@ -184,6 +188,7 @@ export async function planArriveBy(
   const itineraries = data.plan?.itineraries ?? [];
   return itineraries.map((it) => {
     const legs = it.legs.map(shapeLeg);
+    const fare = calcFare(legs, discounts, it.startTime);
     return {
       startTime: it.startTime,
       endTime: it.endTime,
@@ -193,6 +198,8 @@ export async function planArriveBy(
       legs,
       transferDetails: transferDetails(legs),
       co2Grams: calcCo2(legs),
+      fareEuros: fare.base,
+      discountFareEuros: fare.discounted,
     };
   });
 }

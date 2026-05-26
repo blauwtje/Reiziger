@@ -1,12 +1,15 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
-import { config } from './config';
+import { config, API_DIR } from './config';
 import { otpHealth } from './otp/client';
 import { planArriveBy, searchStops, routesAtStop } from './otp/plan';
 import { listRules, createRule, updateRule, deleteRule } from './rules/store';
 import { compileTransfers } from './compile/gtfs';
 import { startRebuild, getRebuildState } from './otp/rebuild';
 import type { TransferRule } from './rules/types';
+import { createServer as createNetServer } from 'node:net';
+import { writeFileSync, unlinkSync } from 'node:fs';
+import { join } from 'node:path';
 
 const app = Fastify({ logger: true });
 await app.register(cors, { origin: true });
@@ -29,12 +32,12 @@ app.get('/api/stops/:id/routes', async (req) => {
 });
 
 app.post('/api/plan', async (req, reply) => {
-  const body = req.body as { from?: string; to?: string; arriveBy?: string; num?: number };
+  const body = req.body as { from?: string; to?: string; arriveBy?: string; num?: number; discounts?: string[] };
   if (!body?.from || !body?.to || !body?.arriveBy) {
     reply.code(400);
     return { error: 'from, to, and arriveBy (ISO local datetime, e.g. 2026-05-27T09:00) are required' };
   }
-  return { itineraries: await planArriveBy(body.from, body.to, body.arriveBy, body.num ?? 6) };
+  return { itineraries: await planArriveBy(body.from, body.to, body.arriveBy, body.num ?? 6, body.discounts ?? []) };
 });
 
 app.get('/api/rules', async () => ({ rules: await listRules() }));
@@ -93,9 +96,31 @@ function normalizeRulePatch(body: unknown): Partial<Omit<TransferRule, 'id'>> {
   return patch;
 }
 
+function findFreePort(start: number, host: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const try_ = (port: number) => {
+      const s = createNetServer();
+      s.once('error', (err: NodeJS.ErrnoException) =>
+        err.code === 'EADDRINUSE' ? try_(port + 1) : reject(err),
+      );
+      s.once('listening', () => s.close(() => resolve(port)));
+      s.listen(port, host);
+    };
+    try_(start);
+  });
+}
+
+const port = await findFreePort(config.port, config.host);
+if (port !== config.port) {
+  app.log.warn({ from: config.port, to: port }, 'Port in use — auto-selected next free port');
+}
+
+const portFile = join(API_DIR, '.dev-port');
+
 try {
-  await app.listen({ port: config.port, host: config.host });
-  app.log.info(`Reiziger API listening on http://${config.host}:${config.port}`);
+  await app.listen({ port, host: config.host });
+  writeFileSync(portFile, String(port));
+  process.on('exit', () => { try { unlinkSync(portFile); } catch {} });
 } catch (err) {
   app.log.error(err);
   process.exit(1);

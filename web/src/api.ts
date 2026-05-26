@@ -43,8 +43,8 @@ export const api = {
   stops: (q: string) => jget<{ stops: StopHit[] }>(`/api/stops?q=${encodeURIComponent(q)}`).then((r) => r.stops),
   routesAtStop: (id: string) =>
     jget<{ routes: RouteHit[] }>(`/api/stops/${encodeURIComponent(id)}/routes`).then((r) => r.routes),
-  plan: (from: string, to: string, arriveBy: string) =>
-    jsend<{ itineraries: ShapedItinerary[] }>('/api/plan', 'POST', { from, to, arriveBy }).then((r) => r.itineraries),
+  plan: (from: string, to: string, arriveBy: string, discounts: string[] = []) =>
+    jsend<{ itineraries: ShapedItinerary[] }>('/api/plan', 'POST', { from, to, arriveBy, discounts }).then((r) => r.itineraries),
   listRules: () => jget<{ rules: TransferRule[] }>('/api/rules').then((r) => r.rules),
   createRule: (rule: Omit<TransferRule, 'id'>) =>
     jsend<{ rule: TransferRule }>('/api/rules', 'POST', rule).then((r) => r.rule),
