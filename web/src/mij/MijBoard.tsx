@@ -59,8 +59,8 @@ export function MijBoard({ profile, onProfileChange }: Props) {
       return;
     }
     setAdviceLoading(true);
-    api.advice().then(setAdvice).catch(() => setAdvice(null)).finally(() => setAdviceLoading(false));
-  }, [profile?.savedRoutes]);
+    api.advice().then(setAdvice).catch((err) => { console.error('advice fetch failed:', err); setAdvice(null); }).finally(() => setAdviceLoading(false));
+  }, [profile]);
 
   if (!profile) return <div className="flex items-center justify-center h-full text-fg-faint text-sm">Laden…</div>;
 

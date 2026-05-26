@@ -10,6 +10,7 @@ const MONTHLY_EUR: Record<string, number> = {
   'ov-jaarkaart':    346,
 };
 
+// Assumption: ~60% of saved-route trips fall in peak hours (commuter pattern).
 const PEAK_SHARE = 0.6;
 
 export interface AdviceOption {
