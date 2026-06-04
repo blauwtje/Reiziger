@@ -1,0 +1,26 @@
+/* Shared chrome for preview cards.
+   Each preview card imports tokens from ../colors_and_type.css and this file. */
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--ink-900);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  letter-spacing: var(--tracking-tight);
+  padding: 20px 22px;
+  box-sizing: border-box;
+  min-height: 100vh;
+  /* Same texture as the product board so cards feel right */
+  background-image:
+    radial-gradient(60% 50% at 92% 0%,  rgba(255,201,23,0.08) 0%, rgba(255,201,23,0) 60%),
+    radial-gradient(55% 45% at 4% 0%,   rgba(63,155,255,0.06) 0%, rgba(63,155,255,0) 60%),
+    radial-gradient(circle at 1px 1px, rgba(238,243,249,0.04) 1px, transparent 1px);
+  background-size: auto, auto, 18px 18px;
+}
+.eyebrow {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--fg-mute); font-weight: 600; margin-bottom: 10px;
+}
+.row { display: flex; gap: 10px; align-items: stretch; }
+.col { display: flex; flex-direction: column; gap: 8px; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: var(--tracking-mono); }
+.label { font-size: 11px; color: var(--fg-mute); }

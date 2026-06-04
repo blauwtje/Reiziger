@@ -1,0 +1,183 @@
+/* =============================================================
+   Reiziger — App tokens (light + dark)
+   Scoped to .r-app so they don't fight with the canvas chrome.
+   Dark is the split-flap board (canonical). Light is "daylight
+   board" — warm off-white paper, ink type, amber accent intact.
+   ============================================================= */
+
+.r-app {
+  /* base — overridden by [data-theme] below */
+  --bg:        #0a0d12;
+  --surface:   #11151c;   /* primary panel */
+  --surface-2: #171c26;   /* raised */
+  --surface-3: #1e2530;   /* hover */
+  --surface-4: #262e3c;   /* selected */
+  --line:      #28303d;
+
+  --fg:        #eef3f9;
+  --fg-dim:    #9aabbe;
+  --fg-mute:   #5c6c7e;
+
+  --signal:        #ffc917;
+  --signal-soft:   #ffd750;
+  --signal-bg:     rgba(255,201,23,0.10);
+  --signal-line:   rgba(255,201,23,0.35);
+
+  --rail:   #ffc917;
+  --bus:    #3f9bff;
+  --tram:   #16c79a;
+  --metro:  #ff6a3d;
+  --ferry:  #8b9bff;
+  --walk:   #9aabbe;
+
+  --ok:   #16c79a;
+  --warn: #ffb020;
+  --late: #ff5b52;
+
+  --ok-bg:   rgba(22,199,154,0.13);
+  --warn-bg: rgba(255,176,32,0.13);
+  --late-bg: rgba(255,91,82,0.14);
+
+  --tex:
+    radial-gradient(60% 50% at 92% 0%,  rgba(255,201,23,0.10) 0%, rgba(255,201,23,0) 60%),
+    radial-gradient(55% 45% at 4% 0%,   rgba(63,155,255,0.08) 0%, rgba(63,155,255,0) 60%),
+    radial-gradient(circle at 1px 1px, rgba(238,243,249,0.045) 1px, transparent 1px);
+  --tex-size: auto, auto, 18px 18px;
+
+  --font-sans: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, Menlo, monospace;
+
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 10px;
+  --r-xl: 14px;
+  --r-2xl: 20px;
+
+  --shadow-card: 0 1px 0 rgba(255,255,255,0.02) inset, 0 8px 24px rgba(0,0,0,0.45);
+  --shadow-flap: 0 1px 0 rgba(255,255,255,0.04) inset,
+                 0 -1px 0 rgba(0,0,0,0.6) inset,
+                 0 2px 6px rgba(0,0,0,0.5);
+  --glow-signal: 0 0 0 1px rgba(255,201,23,0.35),
+                 0 0 24px rgba(255,201,23,0.18);
+
+  font-family: var(--font-sans);
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}
+
+.r-app[data-theme="dark"] {
+  --bg:        #0a0d12;
+  --surface:   #11151c;
+  --surface-2: #171c26;
+  --surface-3: #1e2530;
+  --surface-4: #262e3c;
+  --line:      #28303d;
+  --fg:        #eef3f9;
+  --fg-dim:    #9aabbe;
+  --fg-mute:   #5c6c7e;
+  --tex:
+    radial-gradient(60% 50% at 92% 0%,  rgba(255,201,23,0.10) 0%, rgba(255,201,23,0) 60%),
+    radial-gradient(55% 45% at 4% 0%,   rgba(63,155,255,0.08) 0%, rgba(63,155,255,0) 60%),
+    radial-gradient(circle at 1px 1px, rgba(238,243,249,0.045) 1px, transparent 1px);
+  --shadow-card: 0 1px 0 rgba(255,255,255,0.02) inset, 0 8px 24px rgba(0,0,0,0.45);
+  --shadow-flap: 0 1px 0 rgba(255,255,255,0.04) inset,
+                 0 -1px 0 rgba(0,0,0,0.6) inset,
+                 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.r-app[data-theme="light"] {
+  /* Daylight board — warm off-white paper, deep ink type. Amber stays.
+     Reads like a printed timetable, not a generic light-mode dashboard. */
+  --bg:        #ece7dd;   /* warm paper */
+  --surface:   #f5f1e8;   /* card */
+  --surface-2: #ffffff;   /* raised */
+  --surface-3: #e3ddd0;   /* hover */
+  --surface-4: #dad3c4;   /* selected */
+  --line:      #c9c0ad;
+
+  --fg:        #1b1f27;
+  --fg-dim:    #5c6573;
+  --fg-mute:   #8a8e96;
+
+  --signal:        #b48400;   /* darker amber for AA on paper */
+  --signal-soft:   #c8980f;
+  --signal-bg:     rgba(180,132,0,0.10);
+  --signal-line:   rgba(180,132,0,0.35);
+
+  --rail:   #b48400;
+  --bus:    #1c6bc7;
+  --tram:   #0f8a6b;
+  --metro:  #c9461f;
+  --ferry:  #5b6cc7;
+  --walk:   #5c6573;
+
+  --ok:   #0f8a6b;
+  --warn: #b87010;
+  --late: #c93a32;
+
+  --ok-bg:   rgba(15,138,107,0.10);
+  --warn-bg: rgba(184,112,16,0.12);
+  --late-bg: rgba(201,58,50,0.10);
+
+  --tex:
+    radial-gradient(60% 50% at 92% 0%,  rgba(180,132,0,0.08) 0%, rgba(180,132,0,0) 60%),
+    radial-gradient(55% 45% at 4% 0%,   rgba(28,107,199,0.05) 0%, rgba(28,107,199,0) 60%),
+    radial-gradient(circle at 1px 1px, rgba(20,15,5,0.06) 1px, transparent 1px);
+
+  --shadow-card: 0 1px 0 rgba(255,255,255,0.6) inset, 0 8px 24px rgba(0,0,0,0.06);
+  --shadow-flap: 0 1px 0 rgba(255,255,255,0.7) inset,
+                 0 -1px 0 rgba(0,0,0,0.06) inset,
+                 0 2px 6px rgba(0,0,0,0.08);
+  --glow-signal: 0 0 0 1px rgba(180,132,0,0.40),
+                 0 0 18px rgba(180,132,0,0.20);
+}
+
+.r-app .num,
+.r-app .mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.r-app .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-dim);
+  font-weight: 600;
+}
+
+/* Page texture utility — wallpaper for full phone canvases. */
+.r-app .tex-board {
+  background-color: var(--bg);
+  background-image: var(--tex);
+  background-size: var(--tex-size);
+}
+
+/* Split-flap entry animation */
+@keyframes r-flap-in {
+  0%   { transform: rotateX(-90deg); opacity: 0; }
+  60%  { transform: rotateX(8deg);   opacity: 1; }
+  100% { transform: rotateX(0deg);   opacity: 1; }
+}
+.r-app .flap { transform-origin: top center; animation: r-flap-in 420ms cubic-bezier(.6,.02,.2,1) both; backface-visibility: hidden; }
+.r-app .flap-stagger > * { animation: r-flap-in 420ms cubic-bezier(.6,.02,.2,1) both; }
+.r-app .flap-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.r-app .flap-stagger > *:nth-child(2) { animation-delay: 60ms; }
+.r-app .flap-stagger > *:nth-child(3) { animation-delay: 120ms; }
+.r-app .flap-stagger > *:nth-child(4) { animation-delay: 180ms; }
+.r-app .flap-stagger > *:nth-child(5) { animation-delay: 240ms; }
+.r-app .flap-stagger > *:nth-child(6) { animation-delay: 300ms; }
+.r-app .flap-stagger > *:nth-child(7) { animation-delay: 360ms; }
+
+/* Native scrollbars muted inside the kit */
+.r-app ::-webkit-scrollbar { width: 0; height: 0; }
+
+/* Mini pulse for "live" / "now" markers */
+@keyframes r-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+.r-app .pulse { animation: r-pulse 1.6s ease-in-out infinite; }

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <title>Reiziger — planner (mobile)</title>
+  <meta name="viewport" content="width=1440, initial-scale=1" />
+  <link rel="stylesheet" href="../../colors_and_type.css" />
+  <link rel="stylesheet" href="theme.css" />
+  <style>
+    html, body, #root { height: 100%; margin: 0; }
+    body {
+      background: #f0eee9;
+      font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    * { box-sizing: border-box; }
+    button, input { font-family: inherit; }
+    /* The design-canvas chrome lives in light/warm gray; tabs/borders look
+       nicer when artboards have a subtle frame. We get that for free from
+       DC, no extra styling needed here. */
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script src="data.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="primitives.jsx"></script>
+  <script type="text/babel" src="ios-frame.jsx"></script>
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+
+  <script type="text/babel" src="screen-today.jsx"></script>
+  <script type="text/babel" src="screen-plan.jsx"></script>
+  <script type="text/babel" src="screen-results.jsx"></script>
+  <script type="text/babel" src="screen-settings.jsx"></script>
+
+  <script type="text/babel">
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "theme": "dark",
+      "density": "compact",
+      "accent": "#ffc917"
+    }/*EDITMODE-END*/;
+
+    // Helper: build the iOS-framed screen body. We can't wrap this in a
+    // component — DCSection identifies artboards via a React.type check, so
+    // every DCArtboard must be a literal child of a DCSection.
+    function phone(Screen, theme) {
+      return (
+        <IOSDevice width={402} height={874} dark={theme === 'dark'}>
+          <Screen theme={theme} />
+        </IOSDevice>
+      );
+    }
+
+    function App() {
+      const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+      const theme = t.theme;
+      const other = theme === 'dark' ? 'light' : 'dark';
+      return (
+        <>
+          <DesignCanvas
+            title="Reiziger — Planner (mobile UI kit)"
+            subtitle="Mobile-first planner. Adres-of-station search, slimme suggesties, kortingen, agenda-sync, storingen op jouw routes. Donker (split-flap) + licht (papier) thema."
+          >
+            <DCSection id="today" title="Vandaag" subtitle="Wat zien gebruikers als ze de app openen — vaste reizen, storingen op jouw routes, slim alternatief.">
+              <DCArtboard id="t-today"   label="01 · Vandaag"         width={402} height={874}>{phone(ScreenToday, theme)}</DCArtboard>
+              <DCArtboard id="t-today-l" label={`02 · Vandaag (${other === 'dark' ? 'donker' : 'licht'})`} width={402} height={874}>{phone(ScreenToday, other)}</DCArtboard>
+              <DCArtboard id="t-disr"    label="03 · Storingen"       width={402} height={874}>{phone(ScreenDisruptions, theme)}</DCArtboard>
+            </DCSection>
+
+            <DCSection id="plan" title="Plan een reis" subtitle="Vertrek/aankomst is een adres of station. Mooie datum- en tijdkiezer. Kortingen los aan/uit.">
+              <DCArtboard id="t-plan"    label="04 · Plan"                  width={402} height={874}>{phone(ScreenPlan, theme)}</DCArtboard>
+              <DCArtboard id="t-when"    label="05 · Vertrek/aankomst"      width={402} height={874}>{phone(ScreenDateTime, theme)}</DCArtboard>
+              <DCArtboard id="t-addr"    label="06 · Adres/station picker"  width={402} height={874}>{phone(ScreenAddressPick, theme)}</DCArtboard>
+            </DCSection>
+
+            <DCSection id="results" title="Resultaten & reis" subtitle="Slimme overstaptijd, prijs met korting, perrons, storingsbadges. Reis toevoegen aan agenda.">
+              <DCArtboard id="t-res"     label="07 · Resultaten"   width={402} height={874}>{phone(ScreenResults, theme)}</DCArtboard>
+              <DCArtboard id="t-det"     label="08 · Reisdetail"   width={402} height={874}>{phone(ScreenDetail, theme)}</DCArtboard>
+            </DCSection>
+
+            <DCSection id="me" title="Voorkeuren & abonnement" subtitle="Algemeen + per-stop overstapminimum. Loop- en fietssnelheid. Abonnementsadvies op je werkelijke ritten.">
+              <DCArtboard id="t-set"     label="09 · Voorkeuren (Mij)"   width={402} height={874}>{phone(ScreenSettings, theme)}</DCArtboard>
+              <DCArtboard id="t-abo"     label="10 · Abonnement-advies"  width={402} height={874}>{phone(ScreenAbonnement, theme)}</DCArtboard>
+            </DCSection>
+          </DesignCanvas>
+
+          <TweaksPanel title="Reiziger · tweaks">
+            <TweakSection label="Thema">
+              <TweakRadio
+                label="Modus"
+                value={t.theme}
+                options={[
+                  { value: 'dark',  label: 'Donker' },
+                  { value: 'light', label: 'Licht' },
+                ]}
+                onChange={v => setTweak('theme', v)}
+              />
+            </TweakSection>
+            <TweakSection label="Notities">
+              <div style={{ padding: '6px 12px 10px', fontSize: 12, color: '#666', lineHeight: 1.5 }}>
+                Toggle tussen donker (split-flap board) en licht (warm papier).
+                Beide thema's gebruiken dezelfde amber-signaalkleur, alle nummers
+                blijven mono.
+              </div>
+            </TweakSection>
+          </TweaksPanel>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
