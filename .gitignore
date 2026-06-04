@@ -19,6 +19,9 @@ npm-debug.log*
 api/db/
 api/data/
 
+# runtime port file (written by api on bind, read by vite proxy — not committed)
+api/.dev-port
+
 # env
 .env
 .env.*
@@ -39,3 +42,4 @@ api/.dev-port
 .DS_Store
 .vscode/
 .idea/
+/design-bundle
